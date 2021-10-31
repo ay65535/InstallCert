@@ -1,0 +1,23 @@
+pipeline {
+  agent {
+    docker {
+      image 'eclipse-temurin:11.0.13_8-jdk-focal'
+    }
+
+  }
+  stages {
+    stage('java -version') {
+      steps {
+        sh '''java -version
+javac -version'''
+      }
+    }
+
+    stage('ls') {
+      steps {
+        sh 'ls -l'
+      }
+    }
+
+  }
+}
