@@ -73,4 +73,7 @@ javac -version'''
     }
 
   }
+  parameters {
+    choice(name: 'CHOICES', choices: ['one', 'two', 'three'], description: '')
+  }
 }
