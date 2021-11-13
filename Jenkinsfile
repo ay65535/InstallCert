@@ -1,16 +1,22 @@
 pipeline {
-  agent {
-    docker {
-      image 'eclipse-temurin:11.0.13_8-jdk-focal'
-      reuseNode true
-    }
-
-  }
+  agent any
   stages {
     stage('java -version') {
-      steps {
-        sh '''java -version
+      parallel {
+        stage('java -version') {
+          steps {
+            sh '''java -version
 javac -version'''
+          }
+        }
+
+        stage('java -version (pwsh)') {
+          steps {
+            powershell 'java -version'
+            bat 'javac -version'
+          }
+        }
+
       }
     }
 
