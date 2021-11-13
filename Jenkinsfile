@@ -42,7 +42,7 @@ javac -version'''
 
         stage('gci') {
           steps {
-            powershell 'gci'
+            powershell(script: 'gci', encoding: 'utf-8')
           }
         }
 
