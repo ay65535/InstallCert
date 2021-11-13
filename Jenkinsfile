@@ -12,6 +12,7 @@ pipeline {
           }
           steps {
             echo params.PLATFORM
+            powershell(script: 'gci', encoding: 'UTF-8')
           }
         }
 
@@ -30,34 +31,6 @@ pipeline {
           }
           steps {
             echo params.PLATFORM
-          }
-        }
-
-      }
-    }
-
-    stage('ls') {
-      parallel {
-        stage('windows') {
-          when {
-            expression {
-              params.PLATFORM == 'node1'
-            }
-
-          }
-          steps {
-            powershell(script: 'gci', encoding: 'UTF-8')
-          }
-        }
-
-        stage('linux') {
-          when {
-            expression {
-              params.PLATFORM == 'docker'
-            }
-
-          }
-          steps {
             sh 'ls'
           }
         }
