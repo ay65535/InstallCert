@@ -1,16 +1,32 @@
 pipeline {
-    parameters {
-        choice(name: 'PLATFORM', choices: ['windows', 'linux'], description: 'Run on specific platform')
-    }
-    agent none
-    stages {
-        stage('BuildAndTest') {
-            when { expression { params.PLATFORM == 'windows' } }
-            echo 'windows'
+  agent none
+  stages {
+    stage('BuildAndTestwin') {
+      when {
+        expression {
+          params.PLATFORM == 'windows'
         }
-        stage('BuildAndTest') {
-            when { expression { params.PLATFORM == 'linux' } }
-            echo 'linux'
-        }
+
+      }
+      steps {
+        echo params.PLATFORM
+      }
     }
+
+    stage('BuildAndTest') {
+      when {
+        expression {
+          params.PLATFORM == 'linux'
+        }
+
+      }
+      steps {
+        echo params.PLATFORM
+      }
+    }
+
+  }
+  parameters {
+    choice(name: 'PLATFORM', choices: ['windows', 'linux'], description: 'Run on specific platform')
+  }
 }
