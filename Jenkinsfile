@@ -4,6 +4,12 @@ pipeline {
     stage('java -version') {
       parallel {
         stage('java -version') {
+          agent {
+            docker {
+              image 'eclipse-temurin:11.0.13_8-jdk-focal'
+            }
+
+          }
           steps {
             sh '''java -version
 javac -version'''
@@ -12,7 +18,7 @@ javac -version'''
 
         stage('java -version (pwsh)') {
           steps {
-            powershell 'java -version'
+            bat 'java -version'
             bat 'javac -version'
           }
         }
@@ -21,14 +27,48 @@ javac -version'''
     }
 
     stage('ls') {
-      steps {
-        sh 'ls -l'
+      parallel {
+        stage('ls') {
+          agent {
+            docker {
+              image 'eclipse-temurin:11.0.13_8-jdk-focal'
+            }
+
+          }
+          steps {
+            sh 'ls -l'
+          }
+        }
+
+        stage('gci') {
+          steps {
+            powershell 'gci'
+          }
+        }
+
       }
     }
 
     stage('javac') {
-      steps {
-        sh 'javac ./InstallCert.java'
+      parallel {
+        stage('javac') {
+          agent {
+            docker {
+              image 'eclipse-temurin:11.0.13_8-jdk-focal'
+            }
+
+          }
+          steps {
+            sh 'javac ./InstallCert.java'
+          }
+        }
+
+        stage('javac (pwdh)') {
+          steps {
+            powershell 'javac ./InstallCert.java'
+          }
+        }
+
       }
     }
 
