@@ -2,26 +2,31 @@ pipeline {
   agent none
   stages {
     stage('BuildAndTestwin') {
-      when {
-        expression {
-          params.PLATFORM == 'windows'
+      parallel {
+        stage('windows') {
+          when {
+            expression {
+              params.PLATFORM == 'windows'
+            }
+
+          }
+          steps {
+            echo params.PLATFORM
+          }
         }
 
-      }
-      steps {
-        echo params.PLATFORM
-      }
-    }
+        stage('linux') {
+          when {
+            expression {
+              params.PLATFORM == 'linux'
+            }
 
-    stage('BuildAndTest') {
-      when {
-        expression {
-          params.PLATFORM == 'linux'
+          }
+          steps {
+            echo params.PLATFORM
+          }
         }
 
-      }
-      steps {
-        echo params.PLATFORM
       }
     }
 
