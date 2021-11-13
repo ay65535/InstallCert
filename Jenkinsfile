@@ -1,79 +1,63 @@
 pipeline {
-  agent any
-  stages {
-    stage('java -version') {
-      parallel {
-        stage('java -version') {
-          agent {
-            docker {
-              image 'eclipse-temurin:11.0.13_8-jdk-focal'
-            }
-
-          }
-          steps {
-            sh '''java -version
-javac -version'''
-          }
-        }
-
-        stage('java -version (pwsh)') {
-          steps {
-            bat 'java -version'
-            bat 'javac -version'
-          }
-        }
-
-      }
+    parameters {
+        choice(name: 'PLATFORM_FILTER', choices: ['all', 'linux', 'windows', 'mac'], description: 'Run on specific platform')
     }
-
-    stage('ls') {
-      parallel {
-        stage('ls') {
-          agent {
-            docker {
-              image 'eclipse-temurin:11.0.13_8-jdk-focal'
+    agent none
+    stages {
+        stage('BuildAndTest') {
+            matrix {
+                agent {
+                    label "${PLATFORM}-agent"
+                }
+                when { anyOf {
+                    expression { params.PLATFORM_FILTER == 'all' }
+                    expression { params.PLATFORM_FILTER == env.PLATFORM }
+                } }
+                axes {
+                    axis {
+                        name 'PLATFORM'
+                        values 'linux', 'windows', 'mac'
+                    }
+                    axis {
+                        name 'BROWSER'
+                        values 'firefox', 'chrome', 'safari', 'edge'
+                    }
+                }
+                excludes {
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            values 'linux'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'safari'
+                        }
+                    }
+                    exclude {
+                        axis {
+                            name 'PLATFORM'
+                            notValues 'windows'
+                        }
+                        axis {
+                            name 'BROWSER'
+                            values 'edge'
+                        }
+                    }
+                }
+                stages {
+                    stage('Build') {
+                        steps {
+                            echo "Do Build for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                    stage('Test') {
+                        steps {
+                            echo "Do Test for ${PLATFORM} - ${BROWSER}"
+                        }
+                    }
+                }
             }
-
-          }
-          steps {
-            sh 'ls -l'
-          }
         }
-
-        stage('gci') {
-          steps {
-            powershell(script: 'gci', encoding: 'utf-8')
-          }
-        }
-
-      }
     }
-
-    stage('javac') {
-      parallel {
-        stage('javac') {
-          agent {
-            docker {
-              image 'eclipse-temurin:11.0.13_8-jdk-focal'
-            }
-
-          }
-          steps {
-            sh 'javac ./InstallCert.java'
-          }
-        }
-
-        stage('javac (pwdh)') {
-          steps {
-            powershell 'javac ./InstallCert.java'
-          }
-        }
-
-      }
-    }
-
-  }
-  parameters {
-    choice(name: 'CHOICES', choices: ['one', 'two', 'three'], description: '')
-  }
 }
